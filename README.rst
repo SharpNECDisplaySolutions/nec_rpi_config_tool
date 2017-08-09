@@ -102,4 +102,4 @@ SOFTWARE.
 
 What's New
 -----------
-Initial release
+Initial release.
