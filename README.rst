@@ -68,7 +68,7 @@ LIRC
   Enables LIRC (IR decoder) support. Be sure to enable \"IR SIGNAL\" on the \"COMPUTE MODULE\" OSD menu. A reboot is required to activate.
   
 KODI
-  Installs the KODI media player. Set \"CEC\" to \"ON\" on the \"CONTROL\" OSD menu to allow remote control using the display's IR remote. Control buttons are: 1 (|<<), 2 (play), 3 (>>|), 5 (stop), 6 (pause), ENT (select), EXIT, UP, DOWN, LEFT, RIGHT.
+  Installs the KODI media player. Set \"CEC\" to \"ON\" on the \"CONTROL\" OSD menu to allow remote control using the display's IR remote. Control buttons are: 1 (\|<<), 2 (play), 3 (>>\|), 5 (stop), 6 (pause), ENT (select), EXIT, UP, DOWN, LEFT, RIGHT.
 
 REBOOT
   Reboots the Compute Module when done.
