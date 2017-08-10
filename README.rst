@@ -32,16 +32,16 @@ UART
   Enables the UART on the Compute Module to allow communications with the host display. A reboot is required to activate.
 
 SDK
-  Downloads and installs NEC Python PD SDK which provides APIs for communicating with the host display. It will also install the Python Serial module if necessary.
+  Downloads and installs NEC Python PD SDK which provides APIs for communicating with the host display. It will also install the Python Serial module if necessary. The UART option must be installed.
 
 SDKTEST
-  Downloads and installs an example Python file showing how to use the SDK APIs to communicate with the host display. The file will be installed as "/usr/share/NEC/test_routines_example.py".
+  Downloads and installs an example Python file showing how to use the SDK APIs to communicate with the host display. The file will be installed as "/usr/share/NEC/test_routines_example.py". The UART and SDK options must be installed.
 
 SHUTDOWN
   Downloads and installs a Python file that provides System Shutdown support by monitoring GPIO 23 - set low by the display to signal a shutdown. The file will be installed as "/usr/share/NEC/rpi_shutdown.py". Automatic run on startup will be added to "/etc/rc.local". Be sure to enable "SHUTDOWN SIGNAL" on the "COMPUTE MODULE" OSD menu. A reboot is required to activate.
 
 WDT
-  Downloads and installs a Python file that provides hardware based Watchdog Timer support by the host display. The file will be installed as "/usr/share/NEC/reset_display_wdt.py". Automatic run on startup will be added to "/etc/rc.local". Be sure to enable "WDT" and set the "PERIOD TIME" to a minimum of 30 seconds on the "COMPUTE MODULE" OSD menu. A reboot is required to activate.
+  Downloads and installs a Python file that provides hardware based Watchdog Timer support by the host display. The file will be installed as "/usr/share/NEC/reset_display_wdt.py". Automatic run on startup will be added to "/etc/rc.local". Be sure to enable "WDT" and set the "PERIOD TIME" to a minimum of 30 seconds on the "COMPUTE MODULE" OSD menu. The UART and SDK options must be installed. A reboot is required to activate.
 
 WALLP
   Downloads and installs NEC branded desktop wallpaper.
@@ -68,7 +68,7 @@ LIRC
   Enables LIRC (IR decoder) support. Be sure to enable \"IR SIGNAL\" on the \"COMPUTE MODULE\" OSD menu. A reboot is required to activate.
   
 KODI
-  Installs the KODI media player.
+  Installs the KODI media player. Set \"CEC\" to \"ON\" on the \"CONTROL\" OSD menu to allow remote control using the display's IR remote. Control buttons are: 1 (|<<), 2 (play), 3 (>>|), 5 (stop), 6 (pause), ENT (select), EXIT, UP, DOWN, LEFT, RIGHT.
 
 REBOOT
   Reboots the Compute Module when done.

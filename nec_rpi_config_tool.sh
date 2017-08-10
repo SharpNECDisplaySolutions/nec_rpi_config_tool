@@ -32,7 +32,7 @@
 #  https://github.com/NECDisplaySolutions/nec_rpi_config_tool #
 ###############################################################
 
-BUILD_NUMBER=170809
+BUILD_NUMBER=170810
 
 # File names and locations
 CONFIG=/boot/config.txt
@@ -590,11 +590,12 @@ menu() {
     for choice in $FUN
       do
       case $choice in
-      SDK) OUTPUT_MSG+="\nSDK) Python NEC PD SDK test file will be:\n$NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST\nBe sure to enable \"MONITOR CONTROL\" on the \"COMPUTE MODULE\" OSD menu." ;;
-      SDKTEST) OUTPUT_MSG+="\n\nSDKTEST) Python NEC PD SDK test file will be:\n$NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST" ;;
-      WDT) OUTPUT_MSG+="\n\nWDT) Watchdog Timer file will be:\n$NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET\nBe sure to enable \"WDT\" and set the \"PERIOD TIME\" to a minimum of 30 seconds on the \"COMPUTE MODULE\" OSD menu. Startup will be added to \"/etc/rc.local\"" ;;
-      SHUTDOWN) OUTPUT_MSG+="\n\nSHUTDOWN) Be sure to enable \"SHUTDOWN SIGNAL\" on the \"COMPUTE MODULE\" OSD menu. Startup will be added to \"/etc/rc.local\"" ;;
-      LIRC) OUTPUT_MSG+="\n\nLIRC) Be sure to enable \"IR SIGNAL\" on the \"COMPUTE MODULE\" OSD menu." ;;
+      SDK) OUTPUT_MSG+="\nSDK) Python NEC PD SDK test file will be:\n   $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST\n   Be sure to enable \"MONITOR CONTROL\" on the \"COMPUTE MODULE\" OSD menu." ;;
+      SDKTEST) OUTPUT_MSG+="\nSDKTEST) Python NEC PD SDK test file will be:\n   $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST" ;;
+      WDT) OUTPUT_MSG+="\nWDT) Watchdog Timer file will be:\n   $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET\n   Be sure to enable \"WDT\" and set the \"PERIOD TIME\" to a minimum of 30\n   seconds on the \"COMPUTE MODULE\" OSD menu. Startup will be added to\n   \"/etc/rc.local\"." ;;
+      SHUTDOWN) OUTPUT_MSG+="\nSHUTDOWN) Be sure to enable \"SHUTDOWN SIGNAL\" on the \"COMPUTE MODULE\"\n   OSD menu. Startup will be added to \"/etc/rc.local\"." ;;
+      LIRC) OUTPUT_MSG+="\nLIRC) Be sure to enable \"IR SIGNAL\" on the \"COMPUTE MODULE\" OSD menu." ;;
+      KODI) OUTPUT_MSG+="\nKODI) Set \"CEC\" to \"ON\" on the \"CONTROL\" OSD menu to allow remote control\n   using the display's IR remote." ;;
 	  esac  
     done      
     if [ -n "$OUTPUT_MSG" ]; then
