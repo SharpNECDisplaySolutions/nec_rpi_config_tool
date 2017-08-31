@@ -18,21 +18,21 @@
 #        Properties->Permissions->Execute->Anyone             #
 #    Next run the script execute the following on the         #
 #    command line:                                            #
-#      sudo ./nec_rpi_config_tool                             #
+#      ./nec_rpi_config_tool                                  #
 #    Make the appropriate selections.                         #
 #                                                             #
 # Notes:                                                      #
 #    1. Best when run on a clean system                       #
 #    2. Unselecting an item does not reverse a previous       #
 #       setting change.                                       #
-#    3. This has been tested on Raspbian (Jessie) with        #
-#       Desktop - July 2017. Other distros may not function   #
+#    3. This has been tested on Raspbian (Stretch) with       #
+#       Desktop - August 2017. Other distros may not function #
 #       correctly.                                            #
 #    4. The latest verson of this file is available on Github #
 #  https://github.com/NECDisplaySolutions/nec_rpi_config_tool #
 ###############################################################
 
-BUILD_NUMBER=170810
+BUILD_NUMBER=170831
 
 # File names and locations
 CONFIG=/boot/config.txt
@@ -59,17 +59,17 @@ ASK_TO_REBOOT=0
 #####################################################
 do_install_nec_wallpaper() {
   if [ -e $WALLPAPER_DIR1 ]; then
-    wget -O $WALLPAPER_DIR1/$WALLPAPER_BITMAP_NAME http://www.necds-engineering.com/nec_pd_sdk/$WALLPAPER_BITMAP_NAME
+    sudo wget -O $WALLPAPER_DIR1/$WALLPAPER_BITMAP_NAME http://www.necds-engineering.com/nec_pd_sdk/$WALLPAPER_BITMAP_NAME
     if [ $? != 0 ]; then return -1 ; fi
     # need to set this while as the 'pi' user
-    sudo -u pi bash -c "pcmanfm --set-wallpaper $WALLPAPER_DIR1/$WALLPAPER_BITMAP_NAME"
+    pcmanfm --set-wallpaper $WALLPAPER_DIR1/$WALLPAPER_BITMAP_NAME
 
   else
     if [ -e $WALLPAPER_DIR2 ]; then
-      wget -O $WALLPAPER_DIR2/$WALLPAPER_BITMAP_NAME http://www.necds-engineering.com/nec_pd_sdk/$WALLPAPER_BITMAP_NAME
+      sudo wget -O $WALLPAPER_DIR2/$WALLPAPER_BITMAP_NAME http://www.necds-engineering.com/nec_pd_sdk/$WALLPAPER_BITMAP_NAME
       if [ $? != 0 ]; then return -1 ; fi
       # need to set this while as the 'pi' user
-      sudo -u pi bash -c "pcmanfm --set-wallpaper $WALLPAPER_DIR2/$WALLPAPER_BITMAP_NAME"
+      pcmanfm --set-wallpaper $WALLPAPER_DIR2/$WALLPAPER_BITMAP_NAME
     fi
   fi 
 }
@@ -106,11 +106,11 @@ show_error() {
 #####################################################
 do_install_python_serial() {
   if [ $DONE_UPDATE -eq 0 ]; then
-    apt-get update
+    sudo apt-get update
     if [ $? != 0 ]; then return -1 ; fi
     DONE_UPDATE=1
   fi
-  apt-get install python-serial
+  sudo apt-get install python-serial
   if [ $? != 0 ]; then return -1 ; fi
 }
 
@@ -122,7 +122,7 @@ do_install_python_serial() {
 # Note:  None                                       #
 #####################################################
 do_install_nec_pd_sdk() {
-  easy_install nec_pd_sdk
+  sudo easy_install nec_pd_sdk
   if [ $? != 0 ]; then return -1 ; fi
   do_install_python_serial
   if [ $? != 0 ]; then return -1 ; fi
@@ -137,13 +137,13 @@ do_install_nec_pd_sdk() {
 #####################################################
 do_update() {
   if [ $DONE_UPDATE -eq 0 ]; then
-    apt-get update
+    sudo apt-get update
     if [ $? != 0 ]; then return -1 ; fi
     DONE_UPDATE=1
   fi
-  apt-get dist-upgrade -y
+  sudo apt-get dist-upgrade -y
   if [ $? != 0 ]; then return -1 ; fi
-  apt-get upgrade -y
+  sudo apt-get upgrade -y
   if [ $? != 0 ]; then return -1 ; fi
 }
 
@@ -160,8 +160,9 @@ do_enable_uart() {
     return 1
   fi
   # modify /boot/cmdline.txt to remove console=serial0,115200 
-  awk '{gsub("console=serial0,115200 ", "");print}' $CMDLINE_TXT > /tmp/cmdline.txt
-  mv /tmp/cmdline.txt $CMDLINE_TXT
+  sudo awk '{gsub("console=serial0,115200 ", "");print}' $CMDLINE_TXT > /tmp/cmdline.txt
+  sudo cp /tmp/cmdline.txt $CMDLINE_TXT
+  rm /tmp/cmdline.txt
 
   set_config_var enable_uart 1 $CONFIG
   add_config_var dtoverlay dtoverlay uart1 uart1 $CONFIG
@@ -227,12 +228,12 @@ do_set_gpu_memory() {
 do_setup_wdt() {
   # download WDT script
   if [ ! -e $NEC_SCRIPTS_DIR ]; then
-    mkdir $NEC_SCRIPTS_DIR
+    sudo mkdir $NEC_SCRIPTS_DIR
   fi
   if [ -e $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET ]; then
-    rm $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET
+    sudo rm $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET
   fi
-  wget -O $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET $GITHUB_NEC_EXAMPLE_FILES/$NEC_SCRIPTS_WDT_RESET
+  sudo wget -O $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET $GITHUB_NEC_EXAMPLE_FILES/$NEC_SCRIPTS_WDT_RESET
   if [ $? != 0 ]; then return -1 ; fi
 
   # Add the line to the "/etc/rc.local"
@@ -243,17 +244,18 @@ do_setup_wdt() {
   /bin/grep -q "$NEC_SCRIPTS_WDT_RESET" /etc/rc.local
   check=$?
   if [ $check == 1 ]; then
-    awk -v line='python '$NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET' &' '/^exit 0$/ {print line; print; next}; 1' /etc/rc.local > /tmp/rc.local
+    sudo awk -v line='python '$NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET' &' '/^exit 0$/ {print line; print; next}; 1' /etc/rc.local > /tmp/rc.local
     check=$?
     made_change=true
   fi
   # If grep or awk has an error, return -1
   if [ $check != 0 ]; then return -1 ; fi
   if [ $made_change == true ]; then
-    sudo mv /tmp/rc.local /etc/rc.local
+    sudo cp /tmp/rc.local /etc/rc.local
+    rm /tmp/rc.local
   fi
   # Set execute permissions to enable
-  chmod a+x /etc/rc.local
+  sudo chmod a+x /etc/rc.local
   ASK_TO_REBOOT=1  
 }
 
@@ -265,7 +267,7 @@ do_setup_wdt() {
 #####################################################
 do_set_keyboard() {
   # Set the keyboard layout
-  setxkbmap us
+  sudo setxkbmap us
   if [ $? != 0 ]; then return -1 ; fi
 }
 
@@ -279,12 +281,12 @@ do_set_keyboard() {
 do_setup_shutdown_signal_script()
 {
   if [ ! -e $NEC_SCRIPTS_DIR ]; then
-    mkdir $NEC_SCRIPTS_DIR
+    sudo mkdir $NEC_SCRIPTS_DIR
   fi
   if [ -e $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_SHUTDOWN_SCRIPT ]; then
-    rm $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_SHUTDOWN_SCRIPT
+    sudo rm $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_SHUTDOWN_SCRIPT
   fi
-  wget -O $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_SHUTDOWN_SCRIPT $GITHUB_NEC_EXAMPLE_FILES/$NEC_SCRIPTS_SHUTDOWN_SCRIPT
+  sudo wget -O $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_SHUTDOWN_SCRIPT $GITHUB_NEC_EXAMPLE_FILES/$NEC_SCRIPTS_SHUTDOWN_SCRIPT
   if [ $? != 0 ]; then return -1 ; fi
 
   # Add the line to the "/etc/rc.local"
@@ -295,7 +297,7 @@ do_setup_shutdown_signal_script()
   /bin/grep -q "$NEC_SCRIPTS_SHUTDOWN_SCRIPT" /etc/rc.local
   check=$?
   if [ $check == 1 ]; then
-      awk -v line='python '$NEC_SCRIPTS_DIR/$NEC_SCRIPTS_SHUTDOWN_SCRIPT' &' '/^exit 0$/ {print line; print; next}; 1' /etc/rc.local > /tmp/rc.local
+      sudo awk -v line='python '$NEC_SCRIPTS_DIR/$NEC_SCRIPTS_SHUTDOWN_SCRIPT' &' '/^exit 0$/ {print line; print; next}; 1' /etc/rc.local > /tmp/rc.local
       check=$?
       made_change=true
   fi
@@ -303,10 +305,11 @@ do_setup_shutdown_signal_script()
   if [ $check != 0 ]; then return -1; fi
 
   if [ $made_change == true ]; then
-      sudo mv /tmp/rc.local /etc/rc.local 
+      sudo cp /tmp/rc.local /etc/rc.local 
+      rm /tmp/rc.local
   fi
   # Set execute permissions to enable  
-  chmod a+x /etc/rc.local
+  sudo chmod a+x /etc/rc.local
   ASK_TO_REBOOT=1  
 }
 
@@ -320,12 +323,12 @@ do_setup_shutdown_signal_script()
 do_install_SDK_test_python_file()
 {
   if [ ! -e $NEC_SCRIPTS_DIR ]; then
-    mkdir $NEC_SCRIPTS_DIR
+    sudo mkdir $NEC_SCRIPTS_DIR
   fi
   if [ -e $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST ]; then
-    rm $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST
+    sudo rm $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST
   fi
-  wget -O $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST $GITHUB_NEC_EXAMPLE_FILES/$NEC_PYTHON_SDK_TEST
+  sudo wget -O $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST $GITHUB_NEC_EXAMPLE_FILES/$NEC_PYTHON_SDK_TEST
   if [ $? != 0 ]; then return -1 ; fi
 }
 
@@ -343,7 +346,7 @@ do_install_SDK_test_python_file()
 #       characters in lua are:  ^$()%.[]*+-?        #
 #####################################################
 do_disable_screen_saver() {
-  edit_ini_file "SeatDefaults" "xserver%-command" "xserver-command=X -s 0 -dpms" $LIGHTDM
+  edit_ini_file "Seat:%*" "xserver%-command" "xserver-command=X -s 0 -dpms" $LIGHTDM
 }
 
 
@@ -360,7 +363,7 @@ do_disable_screen_saver() {
 #####################################################
 edit_ini_file()
 {
-  lua - "$1" "$2" "$3" "$4"<<EOF > $4.bak
+  sudo lua - "$1" "$2" "$3" "$4"<<EOF > /tmp/editini.txt
 
   local section=assert(arg[1])
   local key=assert(arg[2])
@@ -388,7 +391,8 @@ edit_ini_file()
   end
 
 EOF
-  mv "$4.bak" "$4"
+  sudo cp "/tmp/editini.txt" "$4"
+  rm /tmp/editini.txt 
 }
 
 #####################################################
@@ -405,7 +409,7 @@ EOF
 #        entire config line.                        #
 #####################################################
 add_config_var() {
-  lua - "$1" "$2" "$3" "$4" "$5" <<EOF > "$5.bak"
+  sudo lua - "$1" "$2" "$3" "$4" "$5" <<EOF > "/tmp/addvar.txt"
   local key=assert(arg[1])
   local unescaped_key=assert(arg[2])
   local value=assert(arg[3])
@@ -425,7 +429,8 @@ add_config_var() {
     print(unescaped_key.."="..unescaped_value)
   end
 EOF
-  mv "$5.bak" "$5"
+  sudo cp "/tmp/addvar.txt" "$5"
+  rm "/tmp/addvar.txt"
 }
 
 #####################################################
@@ -440,7 +445,7 @@ EOF
 #        key to the left of the "=" in the file.    #
 #####################################################
 set_config_var() {
-  lua - "$1" "$2" "$3" <<EOF > "$3.bak"
+  sudo lua - "$1" "$2" "$3" <<EOF > "/tmp/setvar.txt"
   local key=assert(arg[1])
   local value=assert(arg[2])
   local fn=assert(arg[3])
@@ -458,7 +463,8 @@ set_config_var() {
     print(key.."="..value)
   end
 EOF
-  mv "$3.bak" "$3"
+  sudo cp "/tmp/setvar.txt" "$3"
+  rm "/tmp/setvar.txt"
 }
 
 #####################################################
@@ -497,10 +503,10 @@ set_overscan() {
     return 1
   fi
 
-  [ -e $CONFIG ] || touch $CONFIG
+  [ -e $CONFIG ] || sudo touch $CONFIG
 
   if [ "$1" -eq 0 ]; then # disable overscan
-    sed $CONFIG -i -e "s/^overscan_/#overscan_/"
+    sudo sed $CONFIG -i -e "s/^overscan_/#overscan_/"
     set_config_var disable_overscan 1 $CONFIG
   else # enable overscan
     set_config_var disable_overscan 0 $CONFIG
@@ -517,10 +523,10 @@ set_overscan() {
 #####################################################
 do_kodi() {
   if [ $DONE_UPDATE -eq 0 ]; then
-    apt-get update
+    sudo apt-get update
     DONE_UPDATE=1
   fi
-  apt-get install kodi -y
+  sudo apt-get install kodi -y
   if [ $? != 0 ]; then return -1 ; fi
 }
 
@@ -532,8 +538,8 @@ do_kodi() {
 # Note:  None                                       #
 #####################################################
 do_reboot() {
-  sync
-  reboot
+  sudo sync
+  sudo reboot
   exit 0
 }
 
@@ -629,8 +635,8 @@ menu() {
 
 
 # Verify that the script has been run as root.
-if [ $(id -u) -ne 0 ]; then
-  printf "Script must be run as root. Try 'sudo nec_rpi_config_tool.sh'\n"
+if [ $(id -u) == 0 ]; then
+  printf "Script must NOT be run as root. Try 'nec_rpi_config_tool.sh'\n"
   exit 1
 fi
 

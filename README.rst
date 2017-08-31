@@ -13,9 +13,9 @@ Open a Terminal window in Raspbian and paste the following commands to automatic
 ::
 
   cd Desktop
-  wget -O nec_rpi_config_tool.sh https://raw.githubusercontent.com/NECDisplaySolutions/nec_rpi_config_tool/master/nec_rpi_config_tool.sh
+  wget https://raw.githubusercontent.com/NECDisplaySolutions/nec_rpi_config_tool/master/nec_rpi_config_tool.sh
   chmod a+x nec_rpi_config_tool.sh
-  sudo ./nec_rpi_config_tool.sh
+  ./nec_rpi_config_tool.sh
 
   
 Important Notes:
@@ -102,4 +102,10 @@ SOFTWARE.
 
 What's New
 -----------
+08/31/2017
+Update and test against new Raspbian release (Stretch).
+Sudo no longer required to run the file, it's included.
+
+
+08/10/2017
 Initial release.
