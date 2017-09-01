@@ -23,7 +23,8 @@ Important Notes:
 
 1. Best when run on a clean system.
 2. Unselecting an item does not reverse a previous setting change.
-3. This has been tested on Raspbian (Jessie) with Desktop - July 2017. Other distros may not function correctly.
+3. This has been tested on Raspbian (Jessie and Stretch) with Desktop. There is a possibility it may not work
+   correctly on other distros.
  
  
 Description of Options
@@ -103,7 +104,9 @@ SOFTWARE.
 What's New
 -----------
 08/31/2017
-Update and test against new Raspbian release (Stretch).
+Update and test against new Raspbian release (Jessie and Stretch).  There is a 
+possibility it may not operate correctly on other distros.
+
 Sudo no longer required to run the file, it's included.
 
 
