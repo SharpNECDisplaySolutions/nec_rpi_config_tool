@@ -25,14 +25,14 @@
 #    1. Best when run on a clean system                       #
 #    2. Unselecting an item does not reverse a previous       #
 #       setting change.                                       #
-#    3. This has been tested on Raspbian (Stretch) with       #
+#    3. This has been tested on Raspbian (Jessie and Stretch) #
 #       Desktop - August 2017. Other distros may not function #
 #       correctly.                                            #
 #    4. The latest verson of this file is available on Github #
 #  https://github.com/NECDisplaySolutions/nec_rpi_config_tool #
 ###############################################################
 
-BUILD_NUMBER=170831
+BUILD_NUMBER=170905
 
 # File names and locations
 CONFIG=/boot/config.txt
@@ -144,6 +144,8 @@ do_update() {
   sudo apt-get dist-upgrade -y
   if [ $? != 0 ]; then return -1 ; fi
   sudo apt-get upgrade -y
+  if [ $? != 0 ]; then return -1 ; fi
+  sudo rpi-update
   if [ $? != 0 ]; then return -1 ; fi
 }
 
@@ -634,7 +636,7 @@ menu() {
 }
 
 
-# Verify that the script has been run as root.
+# Verify that the script has not been run as root.
 if [ $(id -u) == 0 ]; then
   printf "Script must NOT be run as root. Try 'nec_rpi_config_tool.sh'\n"
   exit 1
