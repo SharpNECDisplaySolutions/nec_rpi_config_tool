@@ -103,6 +103,9 @@ SOFTWARE.
 
 What's New
 -----------
+09/05/2017
+Updated to update the Raspberry Pi firmware in addition to the OS.
+
 08/31/2017
 Update and test against new Raspbian release (Jessie and Stretch).  There is a 
 possibility it may not operate correctly on other distros.
