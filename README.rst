@@ -41,8 +41,8 @@ SDKTEST
 SHUTDOWN
   Downloads and installs a Python file that provides System Shutdown support by monitoring GPIO 23 - set low by the display to signal a shutdown. The file will be installed as "/usr/share/NEC/rpi_shutdown.py". Automatic run on startup will be added to "/etc/rc.local". Be sure to enable "SHUTDOWN SIGNAL" on the "COMPUTE MODULE" OSD menu. A reboot is required to activate.
 
-WDT
-  Downloads and installs a Python file that provides hardware based Watchdog Timer support by the host display. The file will be installed as "/usr/share/NEC/reset_display_wdt.py". Automatic run on startup will be added to "/etc/rc.local". Be sure to enable "WDT" and set the "PERIOD TIME" to a minimum of 30 seconds on the "COMPUTE MODULE" OSD menu. The UART and SDK options must be installed. A reboot is required to activate.
+WDT_FAN
+  Downloads and installs a Python file that provides both hardware based Watchdog Timer support by the host display and automatic control of the Compute Module cooling fan based on the reported system temperature on the Compute Module. The file will be installed as "/usr/share/NEC/reset_display_wdt.py". Automatic run on startup will be added to "/etc/rc.local". Be sure to enable "WDT" and set the "PERIOD TIME" to a minimum of 30 seconds on the "COMPUTE MODULE" OSD menu. The UART and SDK options must be installed. A reboot is required to activate. Temperature and other configuration settings are set in the file.
 
 WALLP
   Downloads and installs NEC branded desktop wallpaper.
@@ -80,7 +80,7 @@ License
 --------------
 The MIT License
 
-Copyright (c) 2017 NEC Display Solutions, Ltd.
+Copyright (c) 2017-2018 NEC Display Solutions, Ltd.
 Partially based on 'raspi-config' by Alex Bradbury <asb@asbradbury.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -103,6 +103,10 @@ SOFTWARE.
 
 What's New
 -----------
+
+02/22/2018
+Updated to add cooling fan control information to WDT_FAN option.
+
 09/05/2017
 Updated to update the Raspberry Pi firmware in addition to the OS.
 
@@ -111,7 +115,6 @@ Update and test against new Raspbian release (Jessie and Stretch).  There is a
 possibility it may not operate correctly on other distros.
 
 Sudo no longer required to run the file, it's included.
-
 
 08/10/2017
 Initial release.
