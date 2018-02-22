@@ -32,7 +32,7 @@
 #  https://github.com/NECDisplaySolutions/nec_rpi_config_tool #
 ###############################################################
 
-BUILD_NUMBER=170905
+BUILD_NUMBER=180221
 
 # File names and locations
 CONFIG=/boot/config.txt
@@ -573,13 +573,13 @@ do_finish() {
 # Note:  None                                       #
 #####################################################
 menu() {
-  FUN=$(whiptail --separate-output --title "NEC Large-screen display Compute Module Configuration Tool $BUILD_NUMBER" --checklist "Selection Options" 22 78 15\
+  FUN=$(whiptail --separate-output --title "NEC Large-screen display Compute Module Configuration Tool $BUILD_NUMBER" --checklist "Selection Options" 22 79 15\
             "UART" "Enable UART (serial link to display - required for SDK)" on \
-	    "SDK" "Download and install NEC Python PD SDK" on \
-            "SDKTEST" "Download and install NEC PD SDK test file (requires SDK)" on \
-            "SHUTDOWN" "Download and install System Shutdown support" on \
-            "WDT" "Download and install Watchdog Timer (requires SDK)" on \
-            "WALLP" "Download and install NEC desktop wallpaper"    on \
+	    "SDK" "Download & install NEC Python PD SDK" on \
+            "SDKTEST" "Download & install NEC PD SDK test file (requires SDK)" on \
+            "SHUTDOWN" "Download & install System Shutdown support" on \
+            "WDT_FAN" "Download & install Watchdog Timer and Fan Control (req SDK)" on \
+            "WALLP" "Download & install NEC desktop wallpaper"    on \
             "OVERS" "Disable Video Overscan"   on  \
             "HDMI" "Set Pixel Encoding to 0-255"   on \
             "SSAVER" "Disable Desktop Screen Saver"   on \
@@ -600,7 +600,7 @@ menu() {
       case $choice in
       SDK) OUTPUT_MSG+="\nSDK) Python NEC PD SDK test file will be:\n   $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST\n   Be sure to enable \"MONITOR CONTROL\" on the \"COMPUTE MODULE\" OSD menu." ;;
       SDKTEST) OUTPUT_MSG+="\nSDKTEST) Python NEC PD SDK test file will be:\n   $NEC_SCRIPTS_DIR/$NEC_PYTHON_SDK_TEST" ;;
-      WDT) OUTPUT_MSG+="\nWDT) Watchdog Timer file will be:\n   $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET\n   Be sure to enable \"WDT\" and set the \"PERIOD TIME\" to a minimum of 30\n   seconds on the \"COMPUTE MODULE\" OSD menu. Startup will be added to\n   \"/etc/rc.local\"." ;;
+      WDT_FAN) OUTPUT_MSG+="\nWDT_FAN) Watchdog Timer and Fan Control file will be:\n   $NEC_SCRIPTS_DIR/$NEC_SCRIPTS_WDT_RESET\n   Edit the file configuration settings as necessary to disable either\n   function or set the operating parameters.\n   Be sure to enable \"WDT\" and set the \"PERIOD TIME\" to a minimum of 30\n   seconds on the \"COMPUTE MODULE\" OSD menu. Startup will be added to\n   \"/etc/rc.local\"." ;;
       SHUTDOWN) OUTPUT_MSG+="\nSHUTDOWN) Be sure to enable \"SHUTDOWN SIGNAL\" on the \"COMPUTE MODULE\"\n   OSD menu. Startup will be added to \"/etc/rc.local\"." ;;
       LIRC) OUTPUT_MSG+="\nLIRC) Be sure to enable \"IR SIGNAL\" on the \"COMPUTE MODULE\" OSD menu." ;;
       KODI) OUTPUT_MSG+="\nKODI) Set \"CEC\" to \"ON\" on the \"CONTROL\" OSD menu to allow remote control\n   using the display's IR remote." ;;
@@ -615,7 +615,7 @@ menu() {
       SDK) do_install_nec_pd_sdk ;  ERR=$? ; show_error $choice $ERR ;;
       SDKTEST) do_install_SDK_test_python_file ;  ERR=$? ; show_error $choice $ERR ;;
       SHUTDOWN) do_setup_shutdown_signal_script ;  ERR=$? ; show_error $choice $ERR ;;
-      WDT) do_setup_wdt ;  ERR=$? ; show_error $choice $ERR ;;
+      WDT_FAN) do_setup_wdt ;  ERR=$? ; show_error $choice $ERR ;;
       UART) do_enable_uart ;;
       WALLP) do_install_nec_wallpaper ; ERR=$? ; show_error $choice $ERR ;;
       OVERS) set_overscan 0 ;;
