@@ -62,6 +62,9 @@ GPU
 UPDATE
   Downloads and updates the operating system and firmware.
   
+USBIMG
+  Installs a bootloader (courtesy of `Yodeck Digital Signage <https://www.yodeck.com>`_) that allows the OS to be automatically replaced with an OS image file stored on a USB flash drive. During boot, the bootloader will search for a USB storage device and look for OS image files. If an OS image is found, then the bootloader writes the contents of that file to the MMC storage of the Compute Module, effectively replacing the installed OS with the image provided. This can be used with any SD card OS image (or ZIP archive containing the image) that is compatible with the Raspberry Pi. All files that their name starts with "RaspberryPi" and has an extension of "zip" or "img" will be shown on screen so that the user can select one using a USB keyboard. To start the process automatically without user intervention and without needing a keyboard, there must be only one image file and its filename must start with "AUTORaspberryPi" and have an extension of "zip" or "img". If no matching files are found on all USB drives, the Bootloader proceeds with booting the current system. Note that a) *ALL DATA WILL BE ERASED* from the MMC/SD storage of the Raspberry Pi when replacing the OS, b) the Bootloader does not persist after the OS is replaced, c) prefer USB flash drives over of USB hard drives, d) if a flash drive does not work, try another brand/model, e) the USB flash drive can be formatted in FAT, FAT32, NTFS, EXT2, EXT3 or EXT4.
+
 KBD
   Sets the Keyboard layout to "US".
 
@@ -103,6 +106,9 @@ SOFTWARE.
 
 What's New
 -----------
+
+09/02/2018
+Added option to install bootloader that allows to replace the OS using a USB flash drive.
 
 02/22/2018
 Updated to add cooling fan control information to WDT_FAN option.

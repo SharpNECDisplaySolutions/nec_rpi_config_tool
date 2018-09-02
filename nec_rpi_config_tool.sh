@@ -533,6 +533,39 @@ do_kodi() {
 }
 
 #####################################################
+# do_install_initramfs                              #
+# Install Bootloader                                #
+# Params: None                                      #
+# Return: -1 on error                               #
+# Note:  None                                       #
+#####################################################
+do_install_initramfs() {
+  if [ $DONE_UPDATE -eq 0 ]; then
+    sudo apt-get update
+    DONE_UPDATE=1
+  fi
+  sudo apt-get install figlet hdparm pv ntfs-3g -y
+  if [ $? != 0 ]; then return -1 ; fi
+
+  rm -f /tmp/nec_initramfs.tar.gz
+  rm -rf /tmp/nec_initramfs
+  mkdir /tmp/nec_initramfs
+
+  wget https://player-image.yodeck.com/nec_initramfs.tar.gz -O /tmp/nec_initramfs.tar.gz
+  if [ $? != 0 ]; then return -1 ; fi
+
+  tar xvf /tmp/nec_initramfs.tar.gz -C /tmp/nec_initramfs
+  if [ $? != 0 ]; then return -1 ; fi
+
+  pushd . > /dev/null
+  cd /tmp/nec_initramfs
+  sudo ./generate_yodeck_initramfs.sh
+  if [ $? != 0 ]; then return -1 ; fi
+
+  popd > /dev/null
+}
+
+#####################################################
 # do_reboot                                         #
 # Reboot the machine                                #
 # Params: None                                      #
@@ -585,6 +618,7 @@ menu() {
             "SSAVER" "Disable Desktop Screen Saver"   on \
             "GPU" "Set GPU Memory allocation to 192MB"    on \
             "UPDATE" "Update System (Warning: May take a long time)"    off \
+            "USBIMG" "Install Bootloader to allow replacing OS using USB"    on \
 			"KBD" "Set Keyboard layout to US"    off \
 	        "LIRC" "Enable LIRC (IR decoder)"    off \
  	        "KODI" "Install KODI media player"    off \
@@ -624,6 +658,7 @@ menu() {
       GPU) do_set_gpu_memory ;;
       LIRC) do_enable_lirc ;;
       UPDATE) do_update ;  ERR=$? ; show_error $choice $ERR ;;
+      USBIMG) do_install_initramfs ;  ERR=$? ; show_error $choice $ERR ;;
       KBD) do_set_keyboard ;  ERR=$? ; show_error $choice $ERR ;;
       KODI) do_kodi ;  ERR=$? ; show_error $choice $ERR ;;
       REBOOT) do_reboot ;;
