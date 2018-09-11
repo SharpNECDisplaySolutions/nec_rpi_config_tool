@@ -3,7 +3,7 @@ NEC Large-screen display - Compute Module Configuration Tool
 
 A menu based tool for automatically downloading and configuring various components and settings for Raspbian OS on the Raspberry Pi Compute Module for use in compatible NEC Large-screen display models. 
 
-See the `NEC Large-Screen Pxx4 and Vxx4 Displays - Raspberry Pi Compute Module Setup Guide
+See the `NEC Large-Screen Displays - Raspberry Pi Compute Module Setup Guide
 <http://www.necdisplay.com/support-and-services/raspberry-pi/>`_ for more information.
 
 Download and run
