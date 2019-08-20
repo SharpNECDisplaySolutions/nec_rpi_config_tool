@@ -32,7 +32,7 @@
 #  https://github.com/NECDisplaySolutions/nec_rpi_config_tool #
 ###############################################################
 
-BUILD_NUMBER=180221
+BUILD_NUMBER=190820
 
 # File names and locations
 CONFIG=/boot/config.txt
@@ -119,10 +119,12 @@ do_install_python_serial() {
 # Install the NEC SDK                               #
 # Params: None                                      #
 # Return: -1 on error                               #
-# Note:  None                                       #
+# Note:  Have to use pip instead of easy_install.   #
+#        easy_install is depracated and no longer   #
+#        included.                                  #
 #####################################################
 do_install_nec_pd_sdk() {
-  sudo easy_install nec_pd_sdk
+  sudo pip install nec_pd_sdk
   if [ $? != 0 ]; then return -1 ; fi
   do_install_python_serial
   if [ $? != 0 ]; then return -1 ; fi
@@ -144,8 +146,6 @@ do_update() {
   sudo apt-get dist-upgrade -y
   if [ $? != 0 ]; then return -1 ; fi
   sudo apt-get upgrade -y
-  if [ $? != 0 ]; then return -1 ; fi
-  sudo rpi-update
   if [ $? != 0 ]; then return -1 ; fi
 }
 
@@ -200,7 +200,7 @@ do_enable_lirc() {
   if ! mountpoint -q /boot; then
     return 1
   fi
-  add_config_var dtoverlay dtoverlay lirc%-rpi lirc-rpi $CONFIG
+  add_config_var dtoverlay dtoverlay lirc%-rpi gpio-ir $CONFIG
   ASK_TO_REBOOT=1  
 }
 
@@ -349,6 +349,8 @@ do_install_SDK_test_python_file()
 #####################################################
 do_disable_screen_saver() {
   edit_ini_file "Seat:%*" "xserver%-command" "xserver-command=X -s 0 -dpms" $LIGHTDM
+
+ASK_TO_REBOOT = 1
 }
 
 
