@@ -83,7 +83,7 @@ License
 --------------
 The MIT License
 
-Copyright (c) 2017-2018 NEC Display Solutions, Ltd.
+Copyright (c) 2017-2019 NEC Display Solutions, Ltd.
 Partially based on 'raspi-config' by Alex Bradbury <asb@asbradbury.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -106,6 +106,8 @@ SOFTWARE.
 
 What's New
 -----------
+08/20/2019
+Changes made so tool will also run on Buster.
 
 09/02/2018
 Added option to install bootloader that allows to replace the OS using a USB flash drive.
