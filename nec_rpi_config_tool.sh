@@ -5,7 +5,7 @@
 #  Raspberry Pi Compute Module Configuration Tool             #
 #  for Raspbian OS                                            #
 #                                                             #
-# by Will Hollingworth & Tammy Marr                           #
+# by Will Hollingworth & Tammy Denny                          #
 #    NEC Display Solutions, Ltd.                              #
 # partially based on 'raspi-config' by:                       #
 #  Alex Bradbury <asb@asbradbury.org>                         #
@@ -32,7 +32,7 @@
 #  https://github.com/NECDisplaySolutions/nec_rpi_config_tool #
 ###############################################################
 
-BUILD_NUMBER=190820
+BUILD_NUMBER=220601
 
 # File names and locations
 CONFIG=/boot/config.txt
@@ -45,10 +45,12 @@ WALLPAPER_DIR2=/usr/share/pixel-wallpaper
 WALLPAPER_DIR1=/usr/share/rpd-wallpaper
 WALLPAPER_BITMAP_NAME=NEC_RaspberryPi_BG_Screen_1920x1080.jpg
 CMDLINE_TXT=/boot/cmdline.txt
-GITHUB_NEC_EXAMPLE_FILES=https://raw.githubusercontent.com/NECDisplaySolutions/necpdsdk/master/examples
+GITHUB_NEC_EXAMPLE_FILES=https://raw.githubusercontent.com/SharpNECDisplaySolutions/necpdsdk/master/examples
 OUTPUT_MSG=""
 DONE_UPDATE=0
 ASK_TO_REBOOT=0
+CM4=0
+BULLSEYE=0
 
 #####################################################
 # do_install_nec_wallpaper                          #
@@ -126,8 +128,11 @@ do_install_python_serial() {
 do_install_nec_pd_sdk() {
   sudo pip install nec_pd_sdk
   if [ $? != 0 ]; then return -1 ; fi
-  do_install_python_serial
-  if [ $? != 0 ]; then return -1 ; fi
+  if [ $BULLSEYE == 0 ]
+  then
+    do_install_python_serial
+    if [ $? != 0 ]; then return -1 ; fi
+  fi
 }
 
 #####################################################
@@ -138,15 +143,30 @@ do_install_nec_pd_sdk() {
 # Note:  None                                       #
 #####################################################
 do_update() {
-  if [ $DONE_UPDATE -eq 0 ]; then
-    sudo apt-get update
-    if [ $? != 0 ]; then return -1 ; fi
+  if [ $DONE_UPDATE -eq 0 ] 
+  then
+    sudo apt update
+    if [ $? != 0 ] 
+    then 
+      return -1 
+    fi
     DONE_UPDATE=1
   fi
-  sudo apt-get dist-upgrade -y
-  if [ $? != 0 ]; then return -1 ; fi
-  sudo apt-get upgrade -y
-  if [ $? != 0 ]; then return -1 ; fi
+  sudo apt dist-upgrade -y
+  if [ $? != 0 ] 
+  then  
+    return -1 
+  fi
+  sudo apt upgrade -y
+  if [ $? != 0 ] 
+  then 
+    return -1 
+  fi
+  sudo apt autoremove -y
+  if [ $? != 0 ]
+  then
+    return -1
+  fi
 }
 
 #####################################################
@@ -167,8 +187,12 @@ do_enable_uart() {
   rm /tmp/cmdline.txt
 
   set_config_var enable_uart 1 $CONFIG
-  add_config_var dtoverlay dtoverlay uart1 uart1 $CONFIG
-  set_config_var core_freq 250 $CONFIG
+  if [ $CM4 -eq 0 ]
+  then
+    add_config_var dtoverlay dtoverlay uart1 uart1 $CONFIG
+    set_config_var core_freq 250 $CONFIG
+  fi
+
   ASK_TO_REBOOT=1
 }
 
@@ -200,7 +224,12 @@ do_enable_lirc() {
   if ! mountpoint -q /boot; then
     return 1
   fi
-  add_config_var dtoverlay dtoverlay lirc%-rpi gpio-ir $CONFIG
+  if [ $CM4 == 1 ]
+  then
+    add_config_var dtoverlay dtoverlay gpio%-ir,gpio%-pin=18 gpio-ir,gpio-pin=18 $CONFIG
+  else
+    add_config_var dtoverlay dtoverlay gpio%-ir gpio-ir $CONFIG
+  fi
   ASK_TO_REBOOT=1  
 }
 
@@ -350,7 +379,7 @@ do_install_SDK_test_python_file()
 do_disable_screen_saver() {
   edit_ini_file "Seat:%*" "xserver%-command" "xserver-command=X -s 0 -dpms" $LIGHTDM
 
-ASK_TO_REBOOT = 1
+  ASK_TO_REBOOT=1
 }
 
 
@@ -539,7 +568,8 @@ do_kodi() {
 # Install Bootloader                                #
 # Params: None                                      #
 # Return: -1 on error                               #
-# Note:  None                                       #
+# Note:  No Longer Used since Yodeck is not         # 
+#        maintaining the bootloader.                #
 #####################################################
 do_install_initramfs() {
   if [ $DONE_UPDATE -eq 0 ]; then
@@ -608,7 +638,10 @@ do_finish() {
 # Note:  None                                       #
 #####################################################
 menu() {
-  FUN=$(whiptail --separate-output --title "NEC Large-screen display Compute Module Configuration Tool $BUILD_NUMBER" --checklist "Selection Options" 22 79 15\
+  FUN=""
+  if [ $CM4 == 1 ]
+  then
+    FUN=$(whiptail --separate-output --title "NEC Large-screen display Compute Module Configuration Tool $BUILD_NUMBER" --checklist "Selection Options" 22 79 15\
             "UART" "Enable UART (serial link to display - required for SDK)" on \
 	    "SDK" "Download & install NEC Python PD SDK" on \
             "SDKTEST" "Download & install NEC PD SDK test file (requires SDK)" on \
@@ -620,12 +653,30 @@ menu() {
             "SSAVER" "Disable Desktop Screen Saver"   on \
             "GPU" "Set GPU Memory allocation to 192MB"    on \
             "UPDATE" "Update System (Warning: May take a long time)"    off \
-            "USBIMG" "Install Bootloader to allow replacing OS using USB"    on \
-			"KBD" "Set Keyboard layout to US"    off \
-	        "LIRC" "Enable LIRC (IR decoder)"    off \
- 	        "KODI" "Install KODI media player"    off \
+	    "KBD" "Set Keyboard layout to US"    off \
+	    "LIRC" "Enable LIRC (IR decoder)"    off \
+ 	    "KODI" "Install KODI media player"    off \
             "REBOOT" "Reboot when done"   off \
    3>&1 1>&2 2>&3)
+  else
+    FUN=$(whiptail --separate-output --title "NEC Large-screen display Compute Module Configuration Tool $BUILD_NUMBER" --checklist "Selection Options" 22 79 15\
+            "UART" "Enable UART (serial link to display - required for SDK)" on \
+	    "SDK" "Download & install NEC Python PD SDK" on \
+            "SDKTEST" "Download & install NEC PD SDK test file (requires SDK)" on \
+            "SHUTDOWN" "Download & install System Shutdown support" on \
+            "WDT_FAN" "Download & install Watchdog Timer and Fan Control (req SDK)" on \
+            "WALLP" "Download & install NEC desktop wallpaper"    on \
+            "OVERS" "Disable Video Overscan"   on  \
+            "HDMI" "Set Pixel Encoding to 0-255"   on \
+            "SSAVER" "Disable Desktop Screen Saver"   on \
+            "GPU" "Set GPU Memory allocation to 192MB"    on \
+            "UPDATE" "Update System (Warning: May take a long time)"    off \
+	    "KBD" "Set Keyboard layout to US"    off \
+	    "LIRC" "Enable LIRC (IR decoder)"    off \
+ 	    "KODI" "Install KODI media player"    off \
+            "REBOOT" "Reboot when done"   off \
+   3>&1 1>&2 2>&3)
+  fi
   RET=$?
   if [ $RET != 0 ]; then
     return 0
@@ -660,7 +711,6 @@ menu() {
       GPU) do_set_gpu_memory ;;
       LIRC) do_enable_lirc ;;
       UPDATE) do_update ;  ERR=$? ; show_error $choice $ERR ;;
-      USBIMG) do_install_initramfs ;  ERR=$? ; show_error $choice $ERR ;;
       KBD) do_set_keyboard ;  ERR=$? ; show_error $choice $ERR ;;
       KODI) do_kodi ;  ERR=$? ; show_error $choice $ERR ;;
       REBOOT) do_reboot ;;
@@ -679,6 +729,19 @@ if [ $(id -u) == 0 ]; then
   exit 1
 fi
 
+
+# Get the OS version/compute module version
+/bin/grep -q "Module 4" /proc/device-tree/model
+if [ $? ==  0 ]
+then
+  CM4=1
+fi
+
+/bin/grep -q "bullseye" /etc/os-release
+if [ $? == 0 ]
+then
+  BULLSEYE=1
+fi
 
 # Execute the menu and exit
 menu
