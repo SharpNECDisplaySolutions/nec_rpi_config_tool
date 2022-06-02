@@ -13,7 +13,7 @@ Open a Terminal window in Raspbian and paste the following commands to automatic
 ::
 
   cd Desktop
-  wget https://raw.githubusercontent.com/NECDisplaySolutions/nec_rpi_config_tool/master/nec_rpi_config_tool.sh
+  wget https://raw.githubusercontent.com/SharpNECDisplaySolutions/nec_rpi_config_tool/master/nec_rpi_config_tool.sh
   chmod a+x nec_rpi_config_tool.sh
   ./nec_rpi_config_tool.sh
 
